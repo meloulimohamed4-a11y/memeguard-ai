@@ -1,0 +1,127 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MEMEGUARD AI</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#080d18;color:#edf3ff;font-family:Arial,sans-serif;padding:18px}
+header{text-align:center;padding:20px 0}
+h1{color:#43e6b2;letter-spacing:2px}
+.sub{color:#9ba9bd;font-size:13px}
+.card{background:#121c2d;border:1px solid #26364d;border-radius:15px;padding:17px;margin:14px 0}
+h2{font-size:17px;margin-top:0}
+.status{color:#43e6b2;font-weight:bold}
+label{display:block;color:#aab8cc;font-size:13px;margin:12px 0 6px}
+input{width:100%;padding:13px;border-radius:9px;border:1px solid #354760;background:#091321;color:white;font-size:16px}
+button{width:100%;padding:14px;border:0;border-radius:9px;background:#43e6b2;color:#07140f;font-weight:bold;font-size:15px;margin-top:12px}
+button.sell{background:#ff687b;color:#20060a}
+button:disabled{opacity:.4}
+.stat{font-size:25px;font-weight:bold;margin-top:8px}
+small{color:#9ba9bd}
+#history{font-size:13px;line-height:1.8}
+</style>
+</head>
+<body>
+<header>
+<h1>MEMEGUARD AI</h1>
+<div class="sub">MEMECOIN RISK CONTROL SYSTEM</div>
+<p class="status">● SYSTÈME EN MODE SIMULATION</p>
+</header>
+
+<div class="card">
+<h2>💰 Portefeuille virtuel</h2>
+<small>Capital de départ</small>
+<div class="stat" id="balance">100,00 €</div>
+<small id="position">Aucune position ouverte</small>
+</div>
+
+<div class="card">
+<h2>⚙️ Paramètres</h2>
+<label>Capital de départ (€)</label>
+<input id="capital" type="number" value="100" min="1">
+<label>Montant par opération (€)</label>
+<input id="amount" type="number" value="5" min="1">
+<label>Stop Loss (%)</label>
+<input id="sl" type="number" value="10" min="1">
+<label>Take Profit (%)</label>
+<input id="tp" type="number" value="20" min="1">
+<button onclick="configure()">Enregistrer les paramètres</button>
+</div>
+
+<div class="card">
+<h2>🔎 Analyse du token</h2>
+<label>Nom du memecoin</label>
+<input id="token" placeholder="Exemple : MEME">
+<label>Prix d'achat fictif (€)</label>
+<input id="price" type="number" placeholder="0.001" step="any">
+<button onclick="buy()">Simuler un achat</button>
+<button class="sell" onclick="sell()">Simuler une vente</button>
+</div>
+
+<div class="card">
+<h2>📊 Position actuelle</h2>
+<div id="positionDetails">Aucune position</div>
+</div>
+
+<div class="card">
+<h2>📜 Historique</h2>
+<div id="history">Aucune opération.</div>
+</div>
+
+<div class="card">
+<small>Important : cette version ne vérifie pas réellement les contrats, les liquidités ou les scams. Elle n'est pas connectée à une blockchain et ne passe aucun ordre réel.</small>
+</div>
+
+<script>
+let balance=100;
+let position=null;
+let history=[];
+
+function configure(){
+ let c=Number(document.getElementById('capital').value);
+ if(c<=0){alert("Capital invalide");return;}
+ if(position){alert("Ferme d'abord ta position.");return;}
+ balance=c;
+ update();
+ alert("Paramètres enregistrés.");
+}
+function buy(){
+ if(position){alert("Une position est déjà ouverte.");return;}
+ let amount=Number(document.getElementById('amount').value);
+ let price=Number(document.getElementById('price').value);
+ let token=document.getElementById('token').value.trim();
+ if(!token||price<=0||amount<=0){alert("Remplis les champs correctement.");return;}
+ if(amount>balance){alert("Capital insuffisant.");return;}
+ balance-=amount;
+ position={token,amount,price};
+ history.unshift("ACHAT simulé : "+token+" pour "+amount+" €");
+ update();
+}
+function sell(){
+ if(!position){alert("Aucune position ouverte.");return;}
+ let current=Number(prompt("Entre le prix actuel fictif du token :"));
+ if(!current||current<=0)return;
+ let value=position.amount*(current/position.price);
+ let gain=value-position.amount;
+ balance+=value;
+ history.unshift("VENTE simulée : "+position.token+" | résultat : "+gain.toFixed(2)+" €");
+ position=null;
+ update();
+}
+function update(){
+ document.getElementById('balance').textContent=balance.toFixed(2)+" €";
+ document.getElementById('position').textContent=position?"Position ouverte : "+position.token:"Aucune position ouverte";
+ document.getElementById('positionDetails').textContent=position?
+ position.token+" — Mise : "+position.amount+" € — Prix : "+position.price:
+ "Aucune position";
+ document.getElementById('history').innerHTML=history.length?
+ history.map(x=>"<div>"+x+"</div>").join(""):"Aucune opération.";
+}
+update();
+</script>
+</body>
+  </html>
+  
